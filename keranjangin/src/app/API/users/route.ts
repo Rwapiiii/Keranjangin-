@@ -14,14 +14,14 @@ export async function POST(request: Request) {
 
     // ──────────────────────────────────────────────────
     // REGISTER
-    // Required body: { action, email, password, username, role }
+    // Required body: { action, email, password, username }
     // ──────────────────────────────────────────────────
     if (action === 'register') {
-      const { email, password, username, role } = body;
+      const { email, password, username, } = body;
 
-      if (!email || !password || !username || !role) {
+      if (!email || !password || !username) {
         return NextResponse.json(
-          { error: 'email, password, username, and role are all required' },
+          { error: 'email, password, username are all required' },
           { status: 400 }
         );
       }
@@ -39,7 +39,7 @@ export async function POST(request: Request) {
       // 2. Insert profile row into public.users
       const { data: userProfile, error: profileError } = await supabase
         .from('users')
-        .insert([{ email, username, role, cart: [] }])
+        .insert([{ email, username, cart: [] }])
         .select()
         .single();
 
