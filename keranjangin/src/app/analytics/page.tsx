@@ -62,12 +62,19 @@ export default function AnalyticsPage() {
                         <span>Keuangan</span>
                     </Link>
                     <div className="pt-4 mt-4 border-t border-slate-100">
-                        <Link className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-500 hover:bg-slate-50 transition-colors hover:text-primary" href="#">
+                        <Link className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-500 hover:bg-slate-50 transition-colors hover:text-primary" href="/pengaturan">
                             <span className="material-symbols-outlined">settings</span>
                             <span>Pengaturan</span>
                         </Link>
                     </div>
                 </nav>
+                <div className="p-4 shrink-0">
+                    <div className="rounded-xl bg-primary p-4 text-white">
+                        <p className="text-xs font-medium opacity-80 mb-2">Pusat Edukasi</p>
+                        <p className="text-sm font-bold mb-3">Tingkatkan omset toko kamu!</p>
+                        <button className="w-full py-2 bg-white/20 hover:bg-white/30 rounded-lg text-xs font-bold transition-all cursor-pointer">Pelajari Sekarang</button>
+                    </div>
+                </div>
             </aside>
 
             {/* MAIN CONTENT AREA */}
