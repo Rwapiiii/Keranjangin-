@@ -17,7 +17,7 @@ export async function POST(request: Request) {
     // Required body: { action, email, password, username }
     // ──────────────────────────────────────────────────
     if (action === 'register') {
-      const { email, password, username, } = body;
+      const { email, password, username } = body;
 
       if (!email || !password || !username) {
         return NextResponse.json(
