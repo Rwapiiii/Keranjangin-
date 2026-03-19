@@ -41,7 +41,7 @@ export default function TambahProdukPengiriman() {
                         <span>Keuangan</span>
                     </Link>
                     <div className="pt-4 mt-4 border-t border-slate-200">
-                        <Link className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-500 hover:bg-slate-50 transition-colors hover:text-primary" href="#">
+                        <Link className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-500 hover:bg-slate-50 transition-colors hover:text-primary" href="/pengaturan">
                             <span className="material-symbols-outlined">settings</span>
                             <span>Pengaturan</span>
                         </Link>

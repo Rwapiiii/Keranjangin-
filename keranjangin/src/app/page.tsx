@@ -42,7 +42,7 @@ export default function Home() {
             <span>Keuangan</span>
           </Link>
           <div className="pt-4 mt-4 border-t border-slate-100">
-            <Link className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-500 hover:text-primary hover:bg-slate-50 transition-colors" href="#">
+            <Link className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-500 hover:text-primary hover:bg-slate-50 transition-colors" href="/pengaturan">
               <span className="material-symbols-outlined">settings</span>
               <span>Pengaturan</span>
             </Link>
