@@ -13,13 +13,14 @@ export async function GET(request: Request) {
         const { searchParams } = new URL(request.url);
         const category = searchParams.get('category');
         const seller = searchParams.get('seller');
-        const seller = searchParams.get('seller');
+        const name = searchParams.get('name');
 
 
         let query = supabase.from('products').select('*');
 
         if (category) query = query.eq('category', category);
         if (seller) query = query.eq('seller', Number(seller));
+        if (name) query = query.ilike('name', `%${name}%`);
 
         const { data, error } = await query.order('created_at', { ascending: false });
 
