@@ -1,3 +1,4 @@
+
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 
@@ -13,10 +14,10 @@ export async function POST(request: Request) {
     const { action } = body;
 
     // ──────────────────────────────────────────────────
-    // REGISTER
+    // REGISTER BUYER
     // Required body: { action, email, password, username }
     // ──────────────────────────────────────────────────
-    if (action === 'register') {
+    if (action === 'registerBuyer') {
       const { email, password, username } = body;
 
       if (!email || !password || !username) {
@@ -39,7 +40,59 @@ export async function POST(request: Request) {
       // 2. Insert profile row into public.users
       const { data: userProfile, error: profileError } = await supabase
         .from('users')
-        .insert([{ email, username, cart: [] }])
+        .insert([{ email, username }])
+        .select()
+        .single();
+
+      if (profileError) {
+        return NextResponse.json({ error: profileError.message }, { status: 500 });
+      }
+
+      return NextResponse.json(
+        {
+          message: 'Registration successful. Please check your email to confirm your account.',
+          user: userProfile,
+          session: authData.session,
+        },
+        { status: 201 }
+      );
+    }
+
+    // ──────────────────────────────────────────────────
+    // REGISTER SELLER
+    // Required body: { action, email, password, username, shopName, shopAddress, postalCode }
+    // ──────────────────────────────────────────────────
+    if (action === 'registerSeller') {
+      const { email, password, username, shopName, shopAddress, postalCode } = body;
+
+      if (!email || !password || !username || !shopName || !shopAddress || !postalCode) {
+        return NextResponse.json(
+          { error: 'email, password, username, shopName, shopAddress, and postalCode are all required' },
+          { status: 400 }
+        );
+      }
+
+      // 1. Create auth user (Supabase stores the password internally in auth.users)
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+
+      if (authError) {
+        return NextResponse.json({ error: authError.message }, { status: 400 });
+      }
+
+      // 2. Insert profile row into public.users
+      const { data: userProfile, error: profileError } = await supabase
+        .from('users')
+        .insert([{ 
+          email, 
+          username,
+          isSeller: true,
+          shopName,
+          shopAddress,
+          postalCode
+        }])
         .select()
         .single();
 

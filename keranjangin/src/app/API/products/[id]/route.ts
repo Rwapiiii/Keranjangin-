@@ -41,10 +41,6 @@ export async function GET(
   }
 }
 
-// ────────────────────────────────────────────────────
-// PUT /API/products/[id]
-//  Update a product (partial or full)
-// ────────────────────────────────────────────────────
 export async function PUT(
   request: Request,
   { params }: { params: Params }
@@ -52,43 +48,101 @@ export async function PUT(
   try {
     const { id } = params;
     const body = await request.json();
+    const { action,  } = body;
     
-    // Extract valid fields you want to allow updating
-    const { name, description, price, stock, category } = body;
+    // ────────────────────────────────────────────────────
+    // PUT /API/products/[id]
+    //  Update a product (partial or full)
+    // ────────────────────────────────────────────────────
+    if (action === "update") {
 
-    // Build the update object dynamically
-    const updateData: any = {};
-    if (name !== undefined) updateData.name = name;
-    if (description !== undefined) updateData.description = description;
-    if (price !== undefined) updateData.price = price;
-    if (stock !== undefined) updateData.stock = stock;
-    if (category !== undefined) updateData.category = category;
+      // Build the update object dynamically
+      const { name, description, price, stock, category } = body;
 
-    if (Object.keys(updateData).length === 0) {
+      const updateData: any = {};
+      if (name !== undefined) updateData.name = name;
+      if (description !== undefined) updateData.description = description;
+      if (price !== undefined) updateData.price = price;
+      if (stock !== undefined) updateData.stock = stock;
+      if (category !== undefined) updateData.category = category;
+
+      if (Object.keys(updateData).length === 0) {
+        return NextResponse.json(
+          { error: 'No valid fields provided to update.' },
+          { status: 400 }
+        );
+      }
+
+      const { data: product, error } = await supabase
+        .from('products')
+        .update(updateData)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) {
+        if (error.code === 'PGRST116') {
+          return NextResponse.json({ error: 'Product not found' }, { status: 404 });
+        }
+        return NextResponse.json({ error: error.message }, { status: 500 });
+      }
+
       return NextResponse.json(
-        { error: 'No valid fields provided to update.' },
-        { status: 400 }
+        { message: 'Product updated successfully', product },
+        { status: 200 }
       );
     }
 
-    const { data: product, error } = await supabase
-      .from('products')
-      .update(updateData)
-      .eq('id', id)
-      .select()
-      .single();
+    // ────────────────────────────────────────────────────
+    // ADD TO CART 
+    // body = { userId, amount }
+    // ────────────────────────────────────────────────────
+    if (action === "addCart") {
+      const { userId, amount } = body;
 
-    if (error) {
-      if (error.code === 'PGRST116') {
-        return NextResponse.json({ error: 'Product not found' }, { status: 404 });
+      const { data: product, error: productError } = await supabase
+        .from('products')
+        .select('price')
+        .eq('id', id)
+        .single();
+      if (productError) {
+        if (productError.code === 'PGRST116') {
+          return NextResponse.json({ error: 'Product not found' }, { status: 404 });
+        }
+        return NextResponse.json({ error: productError.message }, { status: 500 });
       }
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
 
-    return NextResponse.json(
-      { message: 'Product updated successfully', product },
-      { status: 200 }
-    );
+      const cartProduct = {
+        id,
+        price: product.price,
+        amount,
+      };
+
+      const { data: userCart, error: userCartError } = await supabase
+        .from('users')
+        .select('cart')
+        .eq('id', userId)
+        .single();
+      if (userCartError) {
+        return NextResponse.json({ error: userCartError.message }, { status: 500 });
+      }
+      
+      const currentCart = userCart.cart || [];
+      const newCart = [...currentCart, cartProduct];
+
+      const { data: updatedCart, error: updatedCartError } = await supabase
+        .from('users')
+        .update({ cart: newCart })
+        .eq('id', id)
+      if (updatedCartError) {
+        return NextResponse.json({ error: updatedCartError.message }, { status: 500 })
+      }
+ 
+      return NextResponse.json(
+        { message: 'Cart updated successfully', updatedCart },
+        { status: 200 }
+      );
+    }
   } catch (error: any) {
     console.error(`PUT /API/products/[id] error:`, error);
     return NextResponse.json(
