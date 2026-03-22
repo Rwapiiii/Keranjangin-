@@ -42,11 +42,48 @@ export async function GET(
       { status: 200 }
     );
   } catch (error: any) {
-    console.error(`GET /API/products/[id] error:`, error);
+    console.error(`GET /API/transactions/[id] error:`, error);
 
     return NextResponse.json(
       { error: 'Internal Server Error', details: error.message },
       { status: 500 }
     );
+  }
+}
+
+
+// ────────────────────────────────────────────────────
+// PUT /API/transactions/[id]
+//  Update transaction status
+// ────────────────────────────────────────────────────
+export async function PUT(request: Request, { params }: { params: Params }) {
+  try {
+    const { id } = params;
+    
+    const { body } = params.json();
+    const { newStatus } = body;
+
+    const { data: tx, error } = await supabase
+      .from('transactions')
+      .update({ status: newStatus })
+      .eq('id', id);
+      .select()
+      .single();
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+    
+    return NextResponse.json(
+      { tx },
+      { status: 200 }
+    )
+  } catch (error: async) {
+    console.error(`GET /API/transactions/[id] error:`, error);
+
+    return NextResponse.json(
+      { error: 'Internal Server Error', details: error.message },
+      { status: 500 }
+    );
+     
   }
 }

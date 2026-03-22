@@ -48,7 +48,7 @@ export async function PUT(
   try {
     const { id } = params;
     const body = await request.json();
-    const { action,  } = body;
+    const { action } = body;
     
     // ────────────────────────────────────────────────────
     // PUT /API/products/[id]
